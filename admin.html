@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة التحكم | السوق المفتوح - كفر العرب</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <!-- Login Screen -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-box">
+      <div class="login-logo">
+        <span class="logo-main">السوق المفتوح</span>
+        <span class="logo-sub">لوحة التحكم</span>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label>اسم المستخدم</label>
+          <input type="text" id="login-user" value="admin" required />
+        </div>
+        <div class="form-group">
+          <label>كلمة المرور</label>
+          <input type="password" id="login-pass" value="admin123" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">دخول</button>
+        <p id="login-error" class="error-msg"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="dashboard hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="logo-main">السوق المفتوح</span>
+        <span class="logo-sub">كفر العرب</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="stats">
+          <span class="nav-icon">📊</span> الإحصائيات
+        </a>
+        <a href="#" class="nav-item" data-page="listings">
+          <span class="nav-icon">🏠</span> الإعلانات
+        </a>
+        <a href="#" class="nav-item" data-page="contacts">
+          <span class="nav-icon">📩</span> الطلبات
+          <span class="badge" id="contacts-badge">0</span>
+        </a>
+        <a href="#" class="nav-item" data-page="settings">
+          <span class="nav-icon">⚙️</span> الإعدادات
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" class="nav-item">
+          <span class="nav-icon">🌐</span> عرض الموقع
+        </a>
+        <button class="nav-item logout-btn" id="logout-btn">
+          <span class="nav-icon">🚪</span> تسجيل الخروج
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <header class="topbar">
+        <h1 id="page-title">الإحصائيات</h1>
+        <div class="topbar-actions">
+          <button class="btn btn-primary" id="btn-add-listing">+ إضافة إعلان</button>
+        </div>
+      </header>
+
+      <!-- Stats Page -->
+      <section id="page-stats" class="page">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-info">
+              <span class="stat-num" id="stat-total">0</span>
+              <span class="stat-label">إجمالي الإعلانات</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+              <span class="stat-num" id="stat-active">0</span>
+              <span class="stat-label">نشطة</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🏞️</div>
+            <div class="stat-info">
+              <span class="stat-num" id="stat-lands">0</span>
+              <span class="stat-label">أراضي</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🏠</div>
+            <div class="stat-info">
+              <span class="stat-num" id="stat-apts">0</span>
+              <span class="stat-label">شقق</span>
+            </div>
+          </div>
+          <div class="stat-card highlight">
+            <div class="stat-icon">📩</div>
+            <div class="stat-info">
+              <span class="stat-num" id="stat-contacts">0</span>
+              <span class="stat-label">طلبات جديدة</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Listings Page -->
+      <section id="page-listings" class="page hidden">
+        <div class="table-toolbar">
+          <input type="text" id="search-listings" placeholder="بحث في الإعلانات..." class="search-input" />
+          <select id="filter-type" class="filter-select">
+            <option value="">كل الأنواع</option>
+            <option value="land-farm">أرض زراعية</option>
+            <option value="land-building">أرض مباني</option>
+            <option value="apt-sale">شقة تمليك</option>
+            <option value="apt-rent">شقة إيجار</option>
+          </select>
+          <select id="filter-status" class="filter-select">
+            <option value="">كل الحالات</option>
+            <option value="active">نشط</option>
+            <option value="pending">قيد المراجعة</option>
+            <option value="sold">تم البيع</option>
+            <option value="hidden">مخفي</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>العنوان</th>
+                <th>النوع</th>
+                <th>الموقع</th>
+                <th>السعر</th>
+                <th>الحالة</th>
+                <th>المشاهدات</th>
+                <th>التاريخ</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="listings-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Contacts Page -->
+      <section id="page-contacts" class="page hidden">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>الاسم</th>
+                <th>الموبايل</th>
+                <th>نوع الطلب</th>
+                <th>التفاصيل</th>
+                <th>الحالة</th>
+                <th>التاريخ</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="contacts-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Settings Page -->
+      <section id="page-settings" class="page hidden">
+        <div class="settings-card">
+          <h3>تغيير كلمة المرور</h3>
+          <form id="password-form">
+            <div class="form-group">
+              <label>كلمة المرور الحالية</label>
+              <input type="password" id="curr-pass" required />
+            </div>
+            <div class="form-group">
+              <label>كلمة المرور الجديدة</label>
+              <input type="password" id="new-pass" required minlength="6" />
+            </div>
+            <button type="submit" class="btn btn-primary">حفظ</button>
+            <p id="pass-msg" class="success-msg"></p>
+          </form>
+        </div>
+        <div class="settings-card">
+          <h3>معلومات الدخول</h3>
+          <p>اسم المستخدم الافتراضي: <strong>admin</strong></p>
+          <p>كلمة المرور الافتراضية: <strong>admin123</strong></p>
+          <p class="note">يُنصح بتغيير كلمة المرور فورًا بعد أول دخول.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add/Edit Listing Modal -->
+  <div class="modal" id="listing-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <h3 id="modal-title">إضافة إعلان جديد</h3>
+      <form id="listing-form">
+        <input type="hidden" id="edit-id" />
+        <div class="form-row">
+          <div class="form-group">
+            <label>نوع العقار *</label>
+            <select id="f-type" required>
+              <option value="land-farm">أرض زراعية</option>
+              <option value="land-building">أرض مباني</option>
+              <option value="apt-sale">شقة تمليك</option>
+              <option value="apt-rent">شقة إيجار</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>الحالة</label>
+            <select id="f-status">
+              <option value="active">نشط</option>
+              <option value="pending">قيد المراجعة</option>
+              <option value="sold">تم البيع</option>
+              <option value="hidden">مخفي</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>العنوان *</label>
+          <input type="text" id="f-title" required placeholder="مثال: أرض زراعية 2 فدان" />
+        </div>
+        <div class="form-group">
+          <label>الموقع *</label>
+          <input type="text" id="f-location" required placeholder="مثال: كفر العرب - طريق المحلة" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>المساحة</label>
+            <input type="text" id="f-area" placeholder="مثال: 200 م²" />
+          </div>
+          <div class="form-group">
+            <label>السعر *</label>
+            <input type="text" id="f-price" required placeholder="مثال: 850,000 ج.م" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>رقم التواصل *</label>
+            <input type="tel" id="f-phone" required placeholder="01xxxxxxxxx" />
+          </div>
+          <div class="form-group">
+            <label>الأيقونة</label>
+            <input type="text" id="f-icon" placeholder="🏠" value="🏠" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>الوصف</label>
+          <textarea id="f-description" rows="3" placeholder="تفاصيل إضافية عن العقار..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">حفظ الإعلان</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
