@@ -1,347 +1,59 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>السوق المفتوح - قرية كفر العرب | بيع وشراء أراضي وشقق</title>
-  <meta name="description" content="السوق المفتوح بقرية كفر العرب - بيع وشراء أراضي زراعية ومباني وشقق. نحدد المكان ومتوسط السعر وندبرها لك." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>السوق المفتوح - قرية كفر العرب</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="container header-inner">
-      <a href="#" class="logo">
-        <span class="logo-main">السوق المفتوح</span>
-        <span class="logo-sub">كفر العرب</span>
-      </a>
-      <nav class="nav" id="nav">
-        <a href="#home" class="nav-link active">الرئيسية</a>
-        <a href="#lands" class="nav-link">أراضي</a>
-        <a href="#apartments" class="nav-link">شقق</a>
-        <a href="#advice" class="nav-link">نصائح</a>
-        <a href="#contact" class="nav-link">تواصل معنا</a><a href="/admin.html" class="nav-link">لوحة التحكم</a>
-      </nav>
-      <div class="header-actions">
-        <button class="btn btn-outline" id="btn-sell">أعلن عن بيع</button>
-        <button class="btn btn-primary" id="btn-buy">عايز تشتري</button>
-        <button class="menu-toggle" id="menu-toggle" aria-label="القائمة">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
+<header class="header">
+  <div class="container">
+    <div class="logo">
+      <span class="logo-main">السوق المفتوح</span>
+      <span class="logo-sub">كفر العرب</span>
     </div>
-  </header>
-
-  <!-- Hero -->
-  <section class="hero" id="home">
-    <div class="hero-bg"></div>
-    <div class="container hero-content">
-      <div class="hero-badges">
-        <span class="badge badge-sell">للبيع</span>
-        <span class="badge badge-buy">للشراء</span>
-      </div>
-      <h1 class="hero-title">
-        <span class="title-main">السوق المفتوح</span>
-        <span class="title-sub">بقرية كفر العرب</span>
-      </h1>
-      <p class="hero-desc">
-        عايز تشتري قطعة أرض حدد المكان ومتوسط السعر وهندبرها لك<br />
-        عايز تبيع أرض زراعية أو مباني بأعلى سعر هنجيبلك مشتري<br />
-        عايز تشتري شقة تمليك في كفر العرب هنجيبلك شقة تمليك<br />
-        عايز تأجر شقة في كفر العرب هندبر ليك شقة
-      </p>
-      <div class="hero-actions">
-        <a href="#lands" class="btn btn-primary btn-lg">تصفح الأراضي</a>
-        <a href="#apartments" class="btn btn-outline btn-lg">تصفح الشقق</a>
-      </div>
-      <div class="hero-stats">
-        <div class="stat">
-          <span class="stat-num">2.9K+</span>
-          <span class="stat-label">عضو في الجروب</span>
-        </div>
-        <div class="stat">
-          <span class="stat-num">يومياً</span>
-          <span class="stat-label">عروض جديدة</span>
-        </div>
-        <div class="stat">
-          <span class="stat-num">موثوق</span>
-          <span class="stat-label">وسطاء محليون</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Categories -->
-  <section class="categories">
-    <div class="container">
-      <div class="section-header">
-        <h2>اختر ما تبحث عنه</h2>
-        <p>كل ما تحتاجه في كفر العرب في مكان واحد</p>
-      </div>
-      <div class="cats-grid">
-        <a href="#lands" class="cat-card">
-          <div class="cat-icon">🏞️</div>
-          <h3>أراضي زراعية</h3>
-          <p>قطع أراضي بمواقع ممتازة وأسعار تنافسية</p>
-        </a>
-        <a href="#lands" class="cat-card">
-          <div class="cat-icon">🏗️</div>
-          <h3>أراضي مباني</h3>
-          <p>أراضي جاهزة للبناء في أفضل المناطق</p>
-        </a>
-        <a href="#apartments" class="cat-card">
-          <div class="cat-icon">🏠</div>
-          <h3>شقق تمليك</h3>
-          <p>شقق تمليك بتشطيبات مختلفة ومساحات متنوعة</p>
-        </a>
-        <a href="#apartments" class="cat-card">
-          <div class="cat-icon">🔑</div>
-          <h3>شقق إيجار</h3>
-          <p>شقق للإيجار اليومي والشهري والسنوي</p>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Lands Section -->
-  <section class="listings" id="lands">
-    <div class="container">
-      <div class="section-header">
-        <h2>أحدث عروض الأراضي</h2>
-        <p>أراضي زراعية ومباني في كفر العرب والمناطق المجاورة</p>
-      </div>
-      <div class="filters">
-        <button class="filter-btn active" data-filter="all">الكل</button>
-        <button class="filter-btn" data-filter="farm">زراعية</button>
-        <button class="filter-btn" data-filter="building">مباني</button>
-      </div>
-      <div class="listings-grid" id="lands-grid">
-        <!-- Cards will be injected by JS -->
-      </div>
-      <div class="section-cta">
-        <button class="btn btn-primary" id="add-land">أضف أرض للبيع</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Apartments Section -->
-  <section class="listings dark" id="apartments">
-    <div class="container">
-      <div class="section-header">
-        <h2>أحدث عروض الشقق</h2>
-        <p>شقق تمليك وإيجار في كفر العرب</p>
-      </div>
-      <div class="filters">
-        <button class="filter-btn active" data-filter="all">الكل</button>
-        <button class="filter-btn" data-filter="sale">تمليك</button>
-        <button class="filter-btn" data-filter="rent">إيجار</button>
-      </div>
-      <div class="listings-grid" id="apts-grid">
-        <!-- Cards injected by JS -->
-      </div>
-      <div class="section-cta">
-        <button class="btn btn-primary" id="add-apt">أضف شقة</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Advice Section -->
-  <section class="advice" id="advice">
-    <div class="container">
-      <div class="section-header">
-        <h2>نصائح السوق</h2>
-        <p>نصائح مفيدة من أهل كفر العرب والوسطاء الموثوقين</p>
-      </div>
-      <div class="advice-grid">
-        <div class="advice-card">
-          <div class="advice-num">01</div>
-          <h3>حدد الميزانية بدقة</h3>
-          <p>قبل ما تبدأ تبحث، حدد ميزانيتك القصوى ومتوسط السعر اللي تقدر تدفعه. ده بيساعدنا نجيبلك العرض المناسب بسرعة.</p>
-        </div>
-        <div class="advice-card">
-          <div class="advice-num">02</div>
-          <h3>تحقق من الأوراق</h3>
-          <p>تأكد إن الأرض أو الشقة مسجلة ومفيش نزاعات. اطلب كشف مساحي أو عقد تمليك أصلي قبل أي اتفاق.</p>
-        </div>
-        <div class="advice-card">
-          <div class="advice-num">03</div>
-          <h3>زور المكان بنفسك</h3>
-          <p>الصور مش كفاية. روح شوف الموقع والمحيط والخدمات (مياه، كهرباء، طرق) قبل ما تقرر.</p>
-        </div>
-        <div class="advice-card">
-          <div class="advice-num">04</div>
-          <h3>استعن بوسيط موثوق</h3>
-          <p>الوسطاء المحليين في الجروب بيعرفوا السوق كويس وبيساعدوا في التفاوض والحصول على أفضل سعر.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- How it works -->
-  <section class="how">
-    <div class="container">
-      <div class="section-header">
-        <h2>كيف يشتغل السوق؟</h2>
-        <p>ثلاث خطوات بسيطة توصل بيك للصفقة المناسبة</p>
-      </div>
-      <div class="steps">
-        <div class="step">
-          <div class="step-icon">1</div>
-          <h3>حدد طلبك</h3>
-          <p>قولنا عايز تشتري ولا تبيع، أرض ولا شقة، والمكان والميزانية.</p>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-icon">2</div>
-          <h3>نبحث ونرشح</h3>
-          <p>هنبحث في الشبكة المحلية ونرشحلك أفضل العروض المتاحة.</p>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-icon">3</div>
-          <h3>نتابع الصفقة</h3>
-          <p>من المعاينة للتفاوض لحد إتمام الأوراق، معاك خطوة بخطوة.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact / CTA -->
-  <section class="contact" id="contact">
-    <div class="container">
-      <div class="contact-box">
-        <div class="contact-info">
-          <h2>تواصل معنا دلوقتي</h2>
-          <p>عايز تشتري أو تبيع؟ ابعتلنا طلبك وهنرد عليك في أسرع وقت.</p>
-          <ul class="contact-list">
-            <li>
-              <span class="ci-icon">📍</span>
-              <span>قرية كفر العرب – الدقهلية</span>
-            </li>
-            <li>
-              <span class="ci-icon">👥</span>
-              <span>جروب فيسبوك: سوق كفر العرب (2.9K عضو)</span>
-            </li>
-            <li>
-              <span class="ci-icon">💬</span>
-              <span>تواصل عبر الرسائل في الجروب أو النموذج</span>
-            </li>
-          </ul>
-        </div>
-        <form class="contact-form" id="contact-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label>الاسم</label>
-              <input type="text" name="name" required placeholder="اسمك الكامل" />
-            </div>
-            <div class="form-group">
-              <label>رقم الموبايل</label>
-              <input type="tel" name="phone" required placeholder="01xxxxxxxxx" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>نوع الطلب</label>
-            <select name="type" required>
-              <option value="">اختر...</option>
-              <option value="buy-land">عايز أشتري أرض</option>
-              <option value="sell-land">عايز أبيع أرض</option>
-              <option value="buy-apt">عايز أشتري شقة</option>
-              <option value="rent-apt">عايز أأجر شقة</option>
-              <option value="sell-apt">عايز أبيع شقة</option>
-              <option value="other">استفسار آخر</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>التفاصيل</label>
-            <textarea name="details" rows="4" placeholder="اكتب المكان، المساحة، الميزانية، أو أي تفاصيل مهمة..."></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">إرسال الطلب</button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <div class="logo">
-            <span class="logo-main">السوق المفتوح</span>
-            <span class="logo-sub">كفر العرب</span>
-          </div>
-          <p>منصة محلية لبيع وشراء الأراضي والشقق في قرية كفر العرب. نربط البائع بالمشتري بأمان وشفافية.</p>
-        </div>
-        <div class="footer-links">
-          <h4>روابط سريعة</h4>
-          <a href="#lands">الأراضي</a>
-          <a href="#apartments">الشقق</a>
-          <a href="#advice">النصائح</a>
-          <a href="#contact">تواصل</a>
-        </div>
-        <div class="footer-links">
-          <h4>خدماتنا</h4>
-          <a href="#">بيع أراضي</a>
-          <a href="#">شراء أراضي</a>
-          <a href="#">شقق تمليك</a>
-          <a href="#">شقق إيجار</a>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>© 2026 السوق المفتوح – كفر العرب. جميع الحقوق محفوظة.</p>
-        <p class="note">هذا الموقع واجهة عرض مرتبطة بجروب فيسبوك «سوق كفر العرب بيع وشراء نصائح»</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Modal for adding listing -->
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <button class="modal-close" id="modal-close">&times;</button>
-      <h3 id="modal-title">أضف إعلان</h3>
-      <form id="listing-form">
-        <div class="form-group">
-          <label>نوع العقار</label>
-          <select name="propertyType" required>
-            <option value="land-farm">أرض زراعية</option>
-            <option value="land-building">أرض مباني</option>
-            <option value="apt-sale">شقة تمليك</option>
-            <option value="apt-rent">شقة إيجار</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>العنوان / الموقع</label>
-          <input type="text" name="location" required placeholder="مثال: كفر العرب - بجوار المسجد الكبير" />
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>المساحة</label>
-            <input type="text" name="area" placeholder="مثال: 200 متر" />
-          </div>
-          <div class="form-group">
-            <label>السعر</label>
-            <input type="text" name="price" placeholder="مثال: 850,000 جنيه" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>الوصف</label>
-          <textarea name="description" rows="3" placeholder="تفاصيل إضافية..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>رقم التواصل</label>
-          <input type="tel" name="phone" required placeholder="01xxxxxxxxx" />
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">نشر الإعلان</button>
-      </form>
-    </div>
+    <a href="/admin.html" class="nav-link">لوحة التحكم</a>
   </div>
+</header>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
+<section class="hero" id="home">
+  <div class="hero-badges">
+    <div class="badge badge-buy">للشراء</div>
+    <div class="badge badge-sell">للبيع</div>
+  </div>
+  <h1 class="hero-title">السوق المفتوح</h1>
+  <h2 class="hero-subtitle">بقرية كفر العرب</h2>
+  <p class="hero-desc">عايز تشتري قطعة أرض حدد المكان ومتوسط السعر وهندبرها لك<br>عايز تبيع أرض زراعية أو مباني بأعلى سعر هنجيبلك مشتري</p>
+</section>
 
-  <script src="script.js"></script>
+<section class="section" id="lands">
+  <div class="container">
+    <h2 class="section-title">الأراضي</h2>
+    <div class="listings-grid" id="lands-grid"></div>
+  </div>
+</section>
+
+<section class="section" id="apartments">
+  <div class="container">
+    <h2 class="section-title">الشقق</h2>
+    <div class="listings-grid" id="apts-grid"></div>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="container">
+    <h2 class="section-title">تواصل معنا</h2>
+    <form id="contact-form" class="contact-form">
+      <input type="text" name="name" placeholder="الاسم" required>
+      <input type="tel" name="phone" placeholder="رقم الموبايل" required>
+      <textarea name="details" placeholder="التفاصيل" rows="3"></textarea>
+      <button type="submit" class="btn btn-gradient">إرسال</button>
+    </form>
+  </div>
+</section>
+
+<script src="script.js"></script>
 </body>
 </html>
