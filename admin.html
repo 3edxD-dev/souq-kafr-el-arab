@@ -44,7 +44,7 @@ th,td{padding:11px;border-bottom:1px solid #222;text-align:right}
     <input id="farea" placeholder="المساحة">
     <input id="fprice" placeholder="السعر">
     <input id="fphone" placeholder="رقم الموبايل">
-    <input id="fimage" placeholder="رابط الصورة">
+    <input type="file" id="fimage" accept="image/*">
     <textarea id="fdesc" placeholder="الوصف" rows="2"></textarea>
     <button onclick="save()">حفظ</button>
     <button onclick="closeM()" style="background:#333">إلغاء</button>
@@ -75,17 +75,25 @@ async function edit(id){
   document.getElementById('farea').value=data.area||'';
   document.getElementById('fprice').value=data.price||'';
   document.getElementById('fphone').value=data.phone||'';
-  document.getElementById('fimage').value=data.image_url||'';
   document.getElementById('fdesc').value=data.description||'';
   document.getElementById('mt').textContent='تعديل';
   document.getElementById('modal').classList.add('open');
 }
 async function save(){
   const id=document.getElementById('fid').value;
-  const item={type:document.getElementById('ftype').value,title:document.getElementById('ftitle').value,location:document.getElementById('floc').value,area:document.getElementById('farea').value,price:document.getElementById('fprice').value,phone:document.getElementById('fphone').value,image_url:document.getElementById('fimage').value,description:document.getElementById('fdesc').value,status:'active'};
+  const file=document.getElementById('fimage').files[0];
+  let image_url='';
+  if(file){
+    const name=Date.now()+'-'+file.name;
+    const {data:up,error:upErr}=await sb.storage.from('images').upload(name,file);
+    if(upErr){alert('خطأ في رفع الصورة');return}
+    const {data:url}=sb.storage.from('images').getPublicUrl(name);
+    image_url=url.publicUrl;
+  }
+  const item={type:document.getElementById('ftype').value,title:document.getElementById('ftitle').value,location:document.getElementById('floc').value,area:document.getElementById('farea').value,price:document.getElementById('fprice').value,phone:document.getElementById('fphone').value,image_url,description:document.getElementById('fdesc').value,status:'active'};
   if(id) await sb.from('listings').update(item).eq('id',id);
   else await sb.from('listings').insert(item);
-  closeM(); load();
+  closeM(); load(); alert('تم الحفظ');
 }
 async function del(id){if(confirm('حذف؟')){await sb.from('listings').delete().eq('id',id);load()}}
 </script>
