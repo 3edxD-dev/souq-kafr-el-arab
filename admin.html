@@ -3,105 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>لوحة التحكم | السوق المفتوح</title>
+<title>لوحة التحكم</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{font-family:system-ui;background:#0a0a0a;color:#fff;margin:0;padding:16px}
-.login{max-width:340px;margin:50px auto;background:#111;padding:28px;border-radius:14px;text-align:center}
-h2{background:linear-gradient(90deg,#1e90ff,#2ecc71);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-input,select,textarea{width:100%;padding:11px;margin:7px 0;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#fff}
-button{background:linear-gradient(90deg,#1e90ff,#2ecc71);color:#fff;border:none;padding:11px 22px;border-radius:8px;cursor:pointer;font-weight:bold}
-table{width:100%;border-collapse:collapse;margin-top:18px;background:#111;border-radius:10px;overflow:hidden}
-th,td{padding:11px;border-bottom:1px solid #222;text-align:right}
-.btn-sm{padding:6px 12px;font-size:.82rem;margin:2px;border-radius:6px}
-.danger{background:#e74c3c}
-.hidden{display:none!important}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:99}
-.modal.open{display:flex}
-.modal-box{background:#111;padding:22px;border-radius:14px;width:92%;max-width:420px;max-height:90vh;overflow:auto}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#2ecc71;color:#000;padding:10px 20px;border-radius:8px;display:none}
-.toast.show{display:block}
+body{font-family:system-ui;background:#0a0a0a;color:#fff;margin:0;padding:16px}
+.login{max-width:320px;margin:60px auto;background:#111;padding:24px;border-radius:12px;text-align:center}
+input{width:100%;padding:10px;margin:8px 0;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#fff}
+button{background:linear-gradient(90deg,#1e90ff,#2ecc71);color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;width:100%}
+.hidden{display:none}
 </style>
 </head>
 <body>
 <div id="login" class="login">
-  <h2>لوحة التحكم</h2>
-  <p style="color:#888;margin:8px 0 16px">السوق المفتوح</p>
-  <input id="u" value="admin" placeholder="اسم المستخدم">
-  <input id="p" type="password" placeholder="كلمة المرور">
-  <button onclick="doLogin()">دخول</button>
-  <p id="err" style="color:#e74c3c;margin-top:8px"></p>
+  <h2 style="color:#2ecc71">لوحة التحكم</h2>
+  <input id="user" placeholder="المستخدم" value="admin">
+  <input id="pass" type="password" placeholder="كلمة المرور">
+  <button onclick="login()">دخول</button>
+  <p id="msg" style="color:#e74c3c"></p>
 </div>
 <div id="dash" class="hidden">
-  <button onclick="openM()">+ إضافة إعلان</button>
-  <table id="tbl"></table>
-  <p style="margin-top:24px"><a href="/" style="color:#1e90ff">← الموقع الرئيسي</a></p>
+  <h3>مرحباً</h3>
+  <button onclick="add()">+ إضافة إعلان</button>
+  <div id="list"></div>
+  <p><a href="/" style="color:#1e90ff">← الموقع</a></p>
 </div>
-<div class="modal" id="modal">
-  <div class="modal-box">
-    <h3 id="mt">إضافة إعلان</h3>
-    <input id="fid" type="hidden">
-    <select id="ftype"><option value="land-farm">أرض زراعية</option><option value="land-building">أرض مباني</option><option value="apt-sale">شقة تمليك</option><option value="apt-rent">شقة إيجار</option></select>
-    <input id="ftitle" placeholder="العنوان">
-    <input id="floc" placeholder="الموقع">
-    <input id="farea" placeholder="المساحة">
-    <input id="fprice" placeholder="السعر">
-    <input id="fphone" placeholder="رقم الموبايل">
-    <input id="fimage" placeholder="رابط الصورة (اختياري)">
-    <textarea id="fdesc" placeholder="الوصف" rows="2"></textarea>
-    <button onclick="saveL()">حفظ</button>
-    <button onclick="closeM()" style="background:#333;margin-right:8px">إلغاء</button>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
 <script>
-const supabase = supabase.createClient('https://gzftaclifoyjilemqslo.supabase.co','sb_publishable_3ebaW8KmCEBCZ_WjaGhHgA_sMyWh14z');
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
-function doLogin(){
-  if(document.getElementById('u').value==='admin'&&document.getElementById('p').value==='admin123'){
+const sb = supabase.createClient('https://gzftaclifoyjilemqslo.supabase.co','sb_publishable_3ebaW8KmCEBCZ_WjaGhHgA_sMyWh14z');
+function login(){
+  if(document.getElementById('user').value.trim()==='admin' && document.getElementById('pass').value==='admin123'){
     document.getElementById('login').classList.add('hidden');
     document.getElementById('dash').classList.remove('hidden');
-    loadListings();
-  } else document.getElementById('err').textContent='بيانات خاطئة';
+    load();
+  } else document.getElementById('msg').textContent='خطأ';
 }
-async function loadListings(){
-  const {data,error}=await supabase.from('listings').select('*').order('id',{ascending:false});
-  if(error){toast('خطأ في تحميل البيانات');return}
-  const tbl=document.getElementById('tbl');
-  tbl.innerHTML='<tr><th>العنوان</th><th>النوع</th><th>السعر</th><th></th></tr>'+(data||[]).map(l=>`<tr><td>${l.title||''}</td><td>${l.type||''}</td><td>${l.price||''}</td><td><button class="btn-sm" onclick="editL(${l.id})">تعديل</button><button class="btn-sm danger" onclick="delL(${l.id})">حذف</button></td></tr>`).join('');
+async function load(){
+  const {data}=await sb.from('listings').select('*').order('id',{ascending:false});
+  document.getElementById('list').innerHTML = (data||[]).map(r=>`<p>${r.title} - \( {r.price} <button onclick="del( \){r.id})">حذف</button></p>`).join('') || 'لا توجد إعلانات';
 }
-function openM(){document.getElementById('fid').value='';document.getElementById('mt').textContent='إضافة إعلان';document.getElementById('modal').classList.add('open')}
-function closeM(){document.getElementById('modal').classList.remove('open')}
-async function editL(id){
-  const {data}=await supabase.from('listings').select('*').eq('id',id).single();
-  if(!data) return;
-  document.getElementById('fid').value=id;
-  document.getElementById('ftype').value=data.type||'land-farm';
-  document.getElementById('ftitle').value=data.title||'';
-  document.getElementById('floc').value=data.location||'';
-  document.getElementById('farea').value=data.area||'';
-  document.getElementById('fprice').value=data.price||'';
-  document.getElementById('fphone').value=data.phone||'';
-  document.getElementById('fimage').value=data.image_url||'';
-  document.getElementById('fdesc').value=data.description||'';
-  document.getElementById('mt').textContent='تعديل إعلان';
-  document.getElementById('modal').classList.add('open');
+function add(){
+  const t=prompt('العنوان'); if(!t)return;
+  sb.from('listings').insert({title:t,price:prompt('السعر'),phone:prompt('الموبايل'),type:'land',status:'active'}).then(()=>load());
 }
-async function saveL(){
-  const id=document.getElementById('fid').value;
-  const item={type:document.getElementById('ftype').value,title:document.getElementById('ftitle').value,location:document.getElementById('floc').value,area:document.getElementById('farea').value,price:document.getElementById('fprice').value,phone:document.getElementById('fphone').value,image_url:document.getElementById('fimage').value,description:document.getElementById('fdesc').value,status:'active'};
-  let res;
-  if(id){res=await supabase.from('listings').update(item).eq('id',id)}
-  else{res=await supabase.from('listings').insert(item)}
-  if(res.error){toast('خطأ في الحفظ');return}
-  closeM(); loadListings(); toast('تم الحفظ');
-}
-async function delL(id){
-  if(!confirm('حذف الإعلان؟')) return;
-  const {error}=await supabase.from('listings').delete().eq('id',id);
-  if(error){toast('خطأ في الحذف');return}
-  loadListings(); toast('تم الحذف');
-}
+function del(id){ if(confirm('حذف؟')) sb.from('listings').delete().eq('id',id).then(()=>load()); }
 </script>
 </body>
 </html>
