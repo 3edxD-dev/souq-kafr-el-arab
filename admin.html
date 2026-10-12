@@ -1,270 +1,93 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة التحكم | السوق المفتوح - كفر العرب</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="admin.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة التحكم | السوق المفتوح</title>
+<style>
+body{font-family:system-ui;background:#0a0a0a;color:#fff;margin:0;padding:16px}
+.login{max-width:320px;margin:60px auto;background:#111;padding:24px;border-radius:12px;text-align:center}
+input,select,textarea{width:100%;padding:10px;margin:6px 0;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#fff}
+button{background:linear-gradient(90deg,#1e90ff,#2ecc71);color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold}
+table{width:100%;border-collapse:collapse;margin-top:16px;background:#111}
+th,td{padding:10px;border-bottom:1px solid #222;text-align:right}
+.btn-sm{padding:6px 10px;font-size:.8rem;margin:2px}
+.danger{background:#e74c3c}
+.hidden{display:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
+.modal.open{display:flex}
+.modal-box{background:#111;padding:20px;border-radius:12px;width:90%;max-width:400px}
+</style>
 </head>
 <body>
-  <!-- Login Screen -->
-  <div id="login-screen" class="login-screen">
-    <div class="login-box">
-      <div class="login-logo">
-        <span class="logo-main">السوق المفتوح</span>
-        <span class="logo-sub">لوحة التحكم</span>
-      </div>
-      <form id="login-form">
-        <div class="form-group">
-          <label>اسم المستخدم</label>
-          <input type="text" id="login-user" value="admin" required />
-        </div>
-        <div class="form-group">
-          <label>كلمة المرور</label>
-          <input type="password" id="login-pass" value="admin123" required />
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">دخول</button>
-        <p id="login-error" class="error-msg"></p>
-      </form>
-    </div>
+<div id="login" class="login">
+  <h2>لوحة التحكم</h2>
+  <input id="u" value="admin" placeholder="المستخدم">
+  <input id="p" type="password" placeholder="كلمة المرور">
+  <button onclick="login()">دخول</button>
+  <p id="err" style="color:#e74c3c"></p>
+</div>
+<div id="dash" class="hidden">
+  <button onclick="openModal()">+ إضافة إعلان</button>
+  <table id="tbl"></table>
+  <p style="margin-top:20px"><a href="/" style="color:#1e90ff">← الموقع</a> | <a href="#" onclick="logout()" style="color:#e74c3c">خروج</a></p>
+</div>
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3 id="mt">إضافة إعلان</h3>
+    <input id="fid" type="hidden">
+    <select id="ftype"><option value="land">أرض</option><option value="apt">شقة</option></select>
+    <input id="ftitle" placeholder="العنوان">
+    <input id="floc" placeholder="الموقع">
+    <input id="farea" placeholder="المساحة">
+    <input id="fprice" placeholder="السعر">
+    <input id="fphone" placeholder="رقم الموبايل">
+    <input id="fimage" placeholder="رابط الصورة (اختياري)">
+    <button onclick="save()">حفظ</button>
+    <button onclick="closeModal()" style="background:#333">إلغاء</button>
   </div>
-
-  <!-- Dashboard -->
-  <div id="dashboard" class="dashboard hidden">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <span class="logo-main">السوق المفتوح</span>
-        <span class="logo-sub">كفر العرب</span>
-      </div>
-      <nav class="sidebar-nav">
-        <a href="#" class="nav-item active" data-page="stats">
-          <span class="nav-icon">📊</span> الإحصائيات
-        </a>
-        <a href="#" class="nav-item" data-page="listings">
-          <span class="nav-icon">🏠</span> الإعلانات
-        </a>
-        <a href="#" class="nav-item" data-page="contacts">
-          <span class="nav-icon">📩</span> الطلبات
-          <span class="badge" id="contacts-badge">0</span>
-        </a>
-        <a href="#" class="nav-item" data-page="settings">
-          <span class="nav-icon">⚙️</span> الإعدادات
-        </a>
-      </nav>
-      <div class="sidebar-footer">
-        <a href="/" target="_blank" class="nav-item">
-          <span class="nav-icon">🌐</span> عرض الموقع
-        </a>
-        <button class="nav-item logout-btn" id="logout-btn">
-          <span class="nav-icon">🚪</span> تسجيل الخروج
-        </button>
-      </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main">
-      <header class="topbar">
-        <h1 id="page-title">الإحصائيات</h1>
-        <div class="topbar-actions">
-          <button class="btn btn-primary" id="btn-add-listing">+ إضافة إعلان</button>
-        </div>
-      </header>
-
-      <!-- Stats Page -->
-      <section id="page-stats" class="page">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">📋</div>
-            <div class="stat-info">
-              <span class="stat-num" id="stat-total">0</span>
-              <span class="stat-label">إجمالي الإعلانات</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">✅</div>
-            <div class="stat-info">
-              <span class="stat-num" id="stat-active">0</span>
-              <span class="stat-label">نشطة</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🏞️</div>
-            <div class="stat-info">
-              <span class="stat-num" id="stat-lands">0</span>
-              <span class="stat-label">أراضي</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🏠</div>
-            <div class="stat-info">
-              <span class="stat-num" id="stat-apts">0</span>
-              <span class="stat-label">شقق</span>
-            </div>
-          </div>
-          <div class="stat-card highlight">
-            <div class="stat-icon">📩</div>
-            <div class="stat-info">
-              <span class="stat-num" id="stat-contacts">0</span>
-              <span class="stat-label">طلبات جديدة</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Listings Page -->
-      <section id="page-listings" class="page hidden">
-        <div class="table-toolbar">
-          <input type="text" id="search-listings" placeholder="بحث في الإعلانات..." class="search-input" />
-          <select id="filter-type" class="filter-select">
-            <option value="">كل الأنواع</option>
-            <option value="land-farm">أرض زراعية</option>
-            <option value="land-building">أرض مباني</option>
-            <option value="apt-sale">شقة تمليك</option>
-            <option value="apt-rent">شقة إيجار</option>
-          </select>
-          <select id="filter-status" class="filter-select">
-            <option value="">كل الحالات</option>
-            <option value="active">نشط</option>
-            <option value="pending">قيد المراجعة</option>
-            <option value="sold">تم البيع</option>
-            <option value="hidden">مخفي</option>
-          </select>
-        </div>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>العنوان</th>
-                <th>النوع</th>
-                <th>الموقع</th>
-                <th>السعر</th>
-                <th>الحالة</th>
-                <th>المشاهدات</th>
-                <th>التاريخ</th>
-                <th>إجراءات</th>
-              </tr>
-            </thead>
-            <tbody id="listings-tbody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Contacts Page -->
-      <section id="page-contacts" class="page hidden">
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>الاسم</th>
-                <th>الموبايل</th>
-                <th>نوع الطلب</th>
-                <th>التفاصيل</th>
-                <th>الحالة</th>
-                <th>التاريخ</th>
-                <th>إجراءات</th>
-              </tr>
-            </thead>
-            <tbody id="contacts-tbody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Settings Page -->
-      <section id="page-settings" class="page hidden">
-        <div class="settings-card">
-          <h3>تغيير كلمة المرور</h3>
-          <form id="password-form">
-            <div class="form-group">
-              <label>كلمة المرور الحالية</label>
-              <input type="password" id="curr-pass" required />
-            </div>
-            <div class="form-group">
-              <label>كلمة المرور الجديدة</label>
-              <input type="password" id="new-pass" required minlength="6" />
-            </div>
-            <button type="submit" class="btn btn-primary">حفظ</button>
-            <p id="pass-msg" class="success-msg"></p>
-          </form>
-        </div>
-        <div class="settings-card">
-          <h3>معلومات الدخول</h3>
-          <p>اسم المستخدم الافتراضي: <strong>admin</strong></p>
-          <p>كلمة المرور الافتراضية: <strong>admin123</strong></p>
-          <p class="note">يُنصح بتغيير كلمة المرور فورًا بعد أول دخول.</p>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <!-- Add/Edit Listing Modal -->
-  <div class="modal" id="listing-modal">
-    <div class="modal-content">
-      <button class="modal-close" id="modal-close">&times;</button>
-      <h3 id="modal-title">إضافة إعلان جديد</h3>
-      <form id="listing-form">
-        <input type="hidden" id="edit-id" />
-        <div class="form-row">
-          <div class="form-group">
-            <label>نوع العقار *</label>
-            <select id="f-type" required>
-              <option value="land-farm">أرض زراعية</option>
-              <option value="land-building">أرض مباني</option>
-              <option value="apt-sale">شقة تمليك</option>
-              <option value="apt-rent">شقة إيجار</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>الحالة</label>
-            <select id="f-status">
-              <option value="active">نشط</option>
-              <option value="pending">قيد المراجعة</option>
-              <option value="sold">تم البيع</option>
-              <option value="hidden">مخفي</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>العنوان *</label>
-          <input type="text" id="f-title" required placeholder="مثال: أرض زراعية 2 فدان" />
-        </div>
-        <div class="form-group">
-          <label>الموقع *</label>
-          <input type="text" id="f-location" required placeholder="مثال: كفر العرب - طريق المحلة" />
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>المساحة</label>
-            <input type="text" id="f-area" placeholder="مثال: 200 م²" />
-          </div>
-          <div class="form-group">
-            <label>السعر *</label>
-            <input type="text" id="f-price" required placeholder="مثال: 850,000 ج.م" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>رقم التواصل *</label>
-            <input type="tel" id="f-phone" required placeholder="01xxxxxxxxx" />
-          </div>
-          <div class="form-group">
-            <label>الأيقونة</label>
-            <input type="text" id="f-icon" placeholder="🏠" value="🏠" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>الوصف</label>
-          <textarea id="f-description" rows="3" placeholder="تفاصيل إضافية عن العقار..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">حفظ الإعلان</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
-
-  <script src="admin.js"></script>
+</div>
+<script>
+const KEY='souq_listings';
+function getL(){return JSON.parse(localStorage.getItem(KEY)||'[]')}
+function setL(l){localStorage.setItem(KEY,JSON.stringify(l))}
+function login(){
+  if(document.getElementById('u').value==='admin'&&document.getElementById('p').value==='admin123'){
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('dash').classList.remove('hidden');
+    render();
+  } else document.getElementById('err').textContent='خطأ';
+}
+function logout(){location.reload()}
+function render(){
+  const list=getL();
+  document.getElementById('tbl').innerHTML='<tr><th>العنوان</th><th>السعر</th><th></th></tr>'+list.map(l=>`<tr><td>${l.title}</td><td>${l.price}</td><td><button class="btn-sm" onclick="edit(${l.id})">تعديل</button><button class="btn-sm danger" onclick="del(${l.id})">حذف</button></td></tr>`).join('');
+}
+function openModal(){document.getElementById('fid').value='';document.getElementById('mt').textContent='إضافة إعلان';document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function edit(id){
+  const l=getL().find(x=>x.id===id);
+  document.getElementById('fid').value=id;
+  document.getElementById('ftype').value=l.type;
+  document.getElementById('ftitle').value=l.title;
+  document.getElementById('floc').value=l.location;
+  document.getElementById('farea').value=l.area||'';
+  document.getElementById('fprice').value=l.price;
+  document.getElementById('fphone').value=l.phone;
+  document.getElementById('fimage').value=l.image||'';
+  document.getElementById('mt').textContent='تعديل إعلان';
+  document.getElementById('modal').classList.add('open');
+}
+function save(){
+  const id=document.getElementById('fid').value;
+  const item={type:document.getElementById('ftype').value,title:document.getElementById('ftitle').value,location:document.getElementById('floc').value,area:document.getElementById('farea').value,price:document.getElementById('fprice').value,phone:document.getElementById('fphone').value,image:document.getElementById('fimage').value,icon:'🏠'};
+  let list=getL();
+  if(id){const i=list.findIndex(x=>x.id==id);if(i>-1)Object.assign(list[i],item)}
+  else{item.id=Date.now();list.unshift(item)}
+  setL(list);closeModal();render();
+}
+function del(id){if(confirm('حذف؟')){setL(getL().filter(l=>l.id!=id));render()}}
+if(localStorage.getItem('souq_auth')==='1'){document.getElementById('login').classList.add('hidden');document.getElementById('dash').classList.remove('hidden');render()}
+</script>
 </body>
 </html>
