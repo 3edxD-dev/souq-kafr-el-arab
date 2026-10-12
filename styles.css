@@ -947,3 +947,12 @@ a.btn, a.btn:focus, a.btn:active {
   box-shadow: none !important;
   -webkit-tap-highlight-color: transparent !important;
 }
+
+button, a, .btn, [class*="btn"],
+button:focus, a:focus, .btn:focus,
+button:active, a:active, .btn:active,
+button:hover, a:hover, .btn:hover {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
