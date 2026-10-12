@@ -938,3 +938,6 @@ button, input, select, textarea {
     grid-template-columns: 1fr;
   }
 }
+
+*:focus { outline: none !important; }
+button:focus, a:focus, input:focus { outline: none !important; box-shadow: none !important; }
