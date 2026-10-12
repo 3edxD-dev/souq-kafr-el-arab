@@ -21,11 +21,4 @@ function load() {
   document.getElementById('apts-grid').innerHTML = list.filter(l=>l.type==='apt').map(card).join('') || '<p style="text-align:center;color:#888">لا توجد عروض</p>';
 }
 document.getElementById('contact-form').onsubmit = e => { e.preventDefault(); alert('تم الإرسال بنجاح'); e.target.reset(); };
-load();st.remove('active'); });
-      link.classList.add('active');
-    }
-  });
-});
-
-loadLands();
-loadApts();
+load();
