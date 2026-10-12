@@ -941,3 +941,9 @@ button, input, select, textarea {
 
 *:focus { outline: none !important; }
 button:focus, a:focus, input:focus { outline: none !important; box-shadow: none !important; }
+.btn, .btn:focus, .btn:active, .btn:hover,
+a.btn, a.btn:focus, a.btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
