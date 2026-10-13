@@ -1,4 +1,3 @@
-const sb = supabase.createClient("https://gzftaclifoyjilemqslo.supabase.co","sb_publishable_3ebaW8KmCEBCZ_WjaGhHgA_sMyWh14z");
 // ===== Data (localStorage) =====
 const STORAGE_KEY = 'souq_listings';
 const CONTACTS_KEY = 'souq_contacts';
@@ -196,21 +195,21 @@ window.addEventListener('scroll', function() {
 loadLands();
 loadApts();
 
-// ===== Supabase Override =====
-(async function() {
-  try {
-    const { data } = await sb.from('listings').select('*').order('id', {ascending:false});
-    if (data && data.length) {
-      const lands = data.filter(l => !l.type || l.type.includes('land'));
-      const apts = data.filter(l => l.type && l.type.includes('apt'));
-      const landsEl = document.getElementById('lands-grid');
-      const aptsEl = document.getElementById('apts-grid');
-      if (landsEl && lands.length) landsEl.innerHTML = lands.map(l => cardHTML(l)).join('');
-      if (aptsEl && apts.length) aptsEl.innerHTML = apts.map(l => cardHTML(l)).join('');
+// ===== Supabase Sync (added) =====
+(function() {
+  if (typeof supabase === 'undefined') return;
+  var sb = supabase.createClient('https://gzftaclifoyjilemqslo.supabase.co','sb_publishable_3ebaW8KmCEBCZ_WjaGhHgA_sMyWh14z');
+  sb.from('listings').select('*').order('id', {ascending:false}).then(function(res) {
+    if (!res.data || !res.data.length) return;
+    var lands = res.data.filter(function(l) { return !l.type || String(l.type).indexOf('land') !== -1; });
+    var apts = res.data.filter(function(l) { return l.type && String(l.type).indexOf('apt') !== -1; });
+    var landsEl = document.getElementById('lands-grid');
+    var aptsEl = document.getElementById('apts-grid');
+    function makeCard(item) {
+      var img = item.image_url ? '<img src="'+item.image_url+'" style="width:100%;height:100%;object-fit:cover">' : '<span style="font-size:3rem">'+(item.icon||'🏠')+'</span>';
+      return '<div class="listing-card"><div class="listing-img">'+img+'</div><div class="listing-body"><h3>'+(item.title||'')+'</h3><div class="listing-meta">📍 '+(item.location||'')+'<br>📐 '+(item.area||'-')+'</div><div class="listing-price">'+(item.price||'')+'</div><a href="tel:'+(item.phone||'')+'" class="btn btn-gradient">تواصل</a></div></div>';
     }
-  } catch(e) { console.log('Supabase load failed, using local'); }
+    if (landsEl && lands.length) landsEl.innerHTML = lands.map(makeCard).join('');
+    if (aptsEl && apts.length) aptsEl.innerHTML = apts.map(makeCard).join('');
+  });
 })();
-function cardHTML(item) {
-  const img = item.image_url ? `<img src="${item.image_url}" style="width:100%;height:100%;object-fit:cover">` : `<span style="font-size:3rem">${item.icon||'🏠'}</span>`;
-  return `<div class="listing-card"><div class="listing-img">${img}</div><div class="listing-body"><h3>${item.title||''}</h3><div class="listing-meta">📍 ${item.location||''}<br>📐 ${item.area||'-'}</div><div class="listing-price">${item.price||''}</div><a href="tel:${item.phone||''}" class="btn btn-gradient">تواصل</a></div></div>`;
-}
