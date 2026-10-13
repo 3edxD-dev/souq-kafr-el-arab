@@ -8,7 +8,7 @@
 <style>
 body{font-family:system-ui;background:#0a0a0a;color:#fff;margin:0;padding:16px}
 .login{max-width:320px;margin:60px auto;background:#111;padding:24px;border-radius:12px;text-align:center}
-input,select,textarea{width:100%;padding:10px;margin:6px 0;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#fff}
+input{width:100%;padding:10px;margin:6px 0;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#fff}
 button{background:linear-gradient(90deg,#1e90ff,#2ecc71);color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold}
 .hidden{display:none}
 table{width:100%;border-collapse:collapse;margin-top:16px;background:#111}
@@ -40,18 +40,23 @@ function login(){
   } else document.getElementById('msg').textContent='خطأ';
 }
 async function load(){
-  const {data,error}=await sb.from('listings').select('*').order('id',{ascending:false});
+  const {data,error}=await sb.from('listings').select('*');
   const tbl=document.getElementById('tbl');
   if(error){tbl.innerHTML='<tr><td>خطأ: '+error.message+'</td></tr>';return}
   if(!data||!data.length){tbl.innerHTML='<tr><td>لا توجد إعلانات</td></tr>';return}
-  tbl.innerHTML='<tr><th>العنوان</th><th>النوع</th><th>السعر</th><th></th></tr>'+data.map(r=>`<tr><td>${r.title||''}</td><td>${r.type||''}</td><td>${r.price||''}</td><td><button class="btn-sm danger" onclick="del(${r.id})">حذف</button></td></tr>`).join('');
+  tbl.innerHTML='<tr><th>العنوان</th><th>النوع</th><th>السعر</th><th></th></tr>'+data.map((r,i)=>`<tr><td>${r.title||''}</td><td>${r.type||''}</td><td>${r.price||''}</td><td><button class="btn-sm danger" onclick="delRow(${i})">حذف</button></td></tr>`).join('');
+  window._rows = data;
 }
 function showAdd(){
   const t=prompt('العنوان:'); if(!t) return;
   const item={title:t,location:prompt('الموقع')||'',area:prompt('المساحة')||'',price:prompt('السعر')||'',phone:prompt('الموبايل')||'',type:'land-farm',status:'active'};
   sb.from('listings').insert(item).then(()=>{load();alert('تم')});
 }
-function del(id){if(confirm('حذف؟')) sb.from('listings').delete().eq('id',id).then(()=>load())}
+function delRow(i){
+  if(!confirm('حذف؟')) return;
+  const row = window._rows[i];
+  sb.from('listings').delete().eq('title', row.title).eq('phone', row.phone).then(()=>load());
+}
 </script>
 </body>
 </html>
