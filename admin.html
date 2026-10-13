@@ -88,10 +88,11 @@ async function save(){
   const file=document.getElementById('fimage').files[0];
   let image_url='';
   if(file){
-    const name=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9.]/g,'');
-    const up=await sb.storage.from('images').upload(name,file);
-    if(up.error){alert('خطأ في رفع الصورة');return}
-    image_url=sb.storage.from('images').getPublicUrl(name).data.publicUrl;
+    try {
+      const name=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9.]/g,'');
+      const up=await sb.storage.from('images').upload(name,file,{upsert:true});
+      if(!up.error) image_url=sb.storage.from('images').getPublicUrl(name).data.publicUrl;
+    } catch(e) {}
   }
   const item={title:document.getElementById('ftitle').value,location:document.getElementById('floc').value,area:document.getElementById('farea').value,price:document.getElementById('fprice').value,phone:document.getElementById('fphone').value,type:document.getElementById('ftype').value,description:document.getElementById('fdesc').value,status:'active'};
   if(image_url) item.image_url=image_url;
