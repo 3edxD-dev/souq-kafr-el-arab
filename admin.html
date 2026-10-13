@@ -15,6 +15,7 @@ table{width:100%;border-collapse:collapse;margin-top:16px;background:#111}
 th,td{padding:10px;border-bottom:1px solid #222;text-align:right}
 .btn-sm{padding:6px 10px;font-size:.8rem;margin:2px}
 .danger{background:#e74c3c}
+.ok{background:#2ecc71;color:#000}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 .modal.open{display:flex}
 .modal-box{background:#111;padding:20px;border-radius:12px;width:90%;max-width:400px}
@@ -64,7 +65,7 @@ async function load(){
   if(error){tbl.innerHTML='<tr><td>خطأ: '+error.message+'</td></tr>';return}
   rows = data || [];
   if(!rows.length){tbl.innerHTML='<tr><td>لا توجد إعلانات</td></tr>';return}
-  tbl.innerHTML='<tr><th>العنوان</th><th>النوع</th><th>السعر</th><th></th></tr>'+rows.map((r,i)=>`<tr><td>${r.title||''}</td><td>${r.type||''}</td><td>${r.price||''}</td><td><button class="btn-sm" onclick="edit(${i})">تعديل</button><button class="btn-sm danger" onclick="del(${i})">حذف</button></td></tr>`).join('');
+  tbl.innerHTML='<tr><th>العنوان</th><th>النوع</th><th>السعر</th><th>الحالة</th><th></th></tr>'+rows.map((r,i)=>`<tr><td>${r.title||''}</td><td>${r.type||''}</td><td>${r.price||''}</td><td>${r.status==='active'?'منشور':'مخفي'}</td><td><button class="btn-sm" onclick="edit(${i})">تعديل</button><button class="btn-sm ok" onclick="pub(${i})">نشر</button><button class="btn-sm danger" onclick="del(${i})">حذف</button></td></tr>`).join('');
 }
 function openAdd(){document.getElementById('fidx').value='';document.getElementById('mt').textContent='إضافة';document.getElementById('modal').classList.add('open')}
 function closeM(){document.getElementById('modal').classList.remove('open')}
@@ -87,6 +88,10 @@ async function save(){
   if(i===''){await sb.from('listings').insert(item)}
   else{const old=rows[i];await sb.from('listings').update(item).eq('title',old.title).eq('phone',old.phone)}
   closeM(); load();
+}
+function pub(i){
+  const r=rows[i];
+  sb.from('listings').update({status:'active'}).eq('title',r.title).eq('phone',r.phone).then(()=>{load();alert('تم النشر')});
 }
 function del(i){
   if(!confirm('حذف؟')) return;
