@@ -1,4 +1,3 @@
-const sb = supabase.createClient("https://gzftaclifoyjilemqslo.supabase.co","sb_publishable_3ebaW8KmCEBCZ_WjaGhHgA_sMyWh14z");
 // ===== Data (localStorage) =====
 const STORAGE_KEY = 'souq_listings';
 const CONTACTS_KEY = 'souq_contacts';
@@ -135,24 +134,22 @@ document.getElementById('btn-buy').addEventListener('click', function() {
 modalClose.addEventListener('click', closeModal);
 modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
 
-listingForm.addEventListener('submit', async function(e) {
+listingForm.addEventListener('submit', function(e) {
   e.preventDefault();
   var fd = new FormData(listingForm);
-  var item = {
-    title: fd.get('location') || 'إعلان جديد',
-    location: fd.get('location') || '',
-    area: fd.get('area') || '',
-    price: fd.get('price') || '',
-    phone: fd.get('phone') || '',
-    type: fd.get('propertyType') || 'land-farm',
-    description: fd.get('description') || '',
-    status: 'active'
-  };
-  var res = await sb.from('listings').insert(item);
-  if (res.error) { alert('خطأ: ' + res.error.message); return; }
+  var contacts = getContacts();
+  contacts.unshift({
+    id: uuid(),
+    name: 'إعلان جديد من الموقع',
+    phone: fd.get('phone'),
+    type: fd.get('propertyType'),
+    details: 'الموقع: ' + fd.get('location') + ' | المساحة: ' + (fd.get('area') || '-') + ' | السعر: ' + (fd.get('price') || '-') + ' | ' + (fd.get('description') || ''),
+    status: 'new',
+    created_at: new Date().toISOString()
+  });
+  saveContacts(contacts);
   closeModal();
-  showToast('تم إضافة الإعلان بنجاح');
-  setTimeout(function(){ location.reload(); }, 1200);
+  showToast('تم استلام إعلانك! هنتواصل معاك قريب بعد المراجعة');
 });
 
 document.getElementById('contact-form').addEventListener('submit', function(e) {
@@ -197,3 +194,22 @@ window.addEventListener('scroll', function() {
 
 loadLands();
 loadApts();
+
+// ===== Supabase Load Active Listings =====
+(function(){
+  if(typeof supabase==='undefined') return;
+  var sb=supabase.createClient('https://gzftaclifoyjilemqslo.supabase.co','sb_publishable_3ebaW8KmCEBCZ_WjaGhHgA_sMyWh14z');
+  sb.from('listings').select('*').eq('status','active').then(function(res){
+    if(!res.data||!res.data.length) return;
+    var lands=res.data.filter(function(l){return !l.type||String(l.type).indexOf('land')!==-1});
+    var apts=res.data.filter(function(l){return l.type&&String(l.type).indexOf('apt')!==-1});
+    function card(item){
+      var img=item.image_url?'<img src="'+item.image_url+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:3rem">'+(item.icon||'🏠')+'</span>';
+      return '<div class="listing-card"><div class="listing-img">'+img+'</div><div class="listing-body"><h3>'+(item.title||'')+'</h3><div class="listing-meta">📍 '+(item.location||'')+'<br>📐 '+(item.area||'-')+'</div><div class="listing-price">'+(item.price||'')+'</div><a href="tel:'+(item.phone||'')+'" class="btn btn-gradient">تواصل</a></div></div>';
+    }
+    var landsEl=document.getElementById('lands-grid');
+    var aptsEl=document.getElementById('apts-grid');
+    if(landsEl&&lands.length) landsEl.innerHTML=lands.map(card).join('');
+    if(aptsEl&&apts.length) aptsEl.innerHTML=apts.map(card).join('');
+  });
+})();
