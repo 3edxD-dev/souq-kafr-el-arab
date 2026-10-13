@@ -16,6 +16,9 @@ th,td{padding:10px;border-bottom:1px solid #222;text-align:right}
 .btn-sm{padding:6px 10px;font-size:.8rem;margin:2px}
 .danger{background:#e74c3c}
 .ok{background:#2ecc71;color:#000}
+.tabs{margin:16px 0}
+.tabs button{margin-left:8px;background:#333}
+.tabs button.active{background:linear-gradient(90deg,#1e90ff,#2ecc71)}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 .modal.open{display:flex}
 .modal-box{background:#111;padding:20px;border-radius:12px;width:90%;max-width:400px;max-height:90vh;overflow:auto}
@@ -30,8 +33,17 @@ th,td{padding:10px;border-bottom:1px solid #222;text-align:right}
   <p id="msg" style="color:#e74c3c"></p>
 </div>
 <div id="dash" class="hidden">
-  <button onclick="openAdd()">+ إضافة إعلان</button>
-  <table id="tbl"></table>
+  <div class="tabs">
+    <button class="active" onclick="showTab('listings')">الإعلانات</button>
+    <button onclick="showTab('contacts')">طلبات التواصل</button>
+  </div>
+  <div id="listings-tab">
+    <button onclick="openAdd()">+ إضافة إعلان</button>
+    <table id="tbl"></table>
+  </div>
+  <div id="contacts-tab" class="hidden">
+    <table id="ctbl"></table>
+  </div>
   <p><a href="/" style="color:#1e90ff">← الموقع</a></p>
 </div>
 <div class="modal" id="modal">
@@ -60,6 +72,13 @@ function login(){
     load();
   } else document.getElementById('msg').textContent='خطأ';
 }
+function showTab(tab){
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('listings-tab').classList.toggle('hidden', tab!=='listings');
+  document.getElementById('contacts-tab').classList.toggle('hidden', tab!=='contacts');
+  if(tab==='contacts') loadContacts();
+}
 async function load(){
   const {data,error}=await sb.from('listings').select('*');
   const tbl=document.getElementById('tbl');
@@ -67,6 +86,13 @@ async function load(){
   rows = data || [];
   if(!rows.length){tbl.innerHTML='<tr><td>لا توجد إعلانات</td></tr>';return}
   tbl.innerHTML='<tr><th>العنوان</th><th>النوع</th><th>السعر</th><th>الحالة</th><th></th></tr>'+rows.map((r,i)=>`<tr><td>${r.title||''}</td><td>${r.type||''}</td><td>${r.price||''}</td><td>${r.status==='active'?'منشور':'مخفي'}</td><td><button class="btn-sm" onclick="edit(${i})">تعديل</button><button class="btn-sm ok" onclick="pub(${i})">نشر</button><button class="btn-sm danger" onclick="del(${i})">حذف</button></td></tr>`).join('');
+}
+async function loadContacts(){
+  const {data,error}=await sb.from('contacts').select('*').order('id',{ascending:false});
+  const tbl=document.getElementById('ctbl');
+  if(error){tbl.innerHTML='<tr><td>خطأ: '+error.message+'</td></tr>';return}
+  if(!data||!data.length){tbl.innerHTML='<tr><td>لا توجد طلبات</td></tr>';return}
+  tbl.innerHTML='<tr><th>الاسم</th><th>الموبايل</th><th>النوع</th><th>التفاصيل</th></tr>'+data.map(r=>`<tr><td>${r.name||''}</td><td>${r.phone||''}</td><td>${r.type||''}</td><td>${r.details||''}</td></tr>`).join('');
 }
 function openAdd(){document.getElementById('fidx').value='';document.getElementById('mt').textContent='إضافة';document.getElementById('modal').classList.add('open')}
 function closeM(){document.getElementById('modal').classList.remove('open')}
@@ -88,11 +114,11 @@ async function save(){
   const file=document.getElementById('fimage').files[0];
   let image_url='';
   if(file){
-    try {
+    try{
       const name=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9.]/g,'');
       const up=await sb.storage.from('images').upload(name,file,{upsert:true});
       if(!up.error) image_url=sb.storage.from('images').getPublicUrl(name).data.publicUrl;
-    } catch(e) {}
+    }catch(e){}
   }
   const item={title:document.getElementById('ftitle').value,location:document.getElementById('floc').value,area:document.getElementById('farea').value,price:document.getElementById('fprice').value,phone:document.getElementById('fphone').value,type:document.getElementById('ftype').value,description:document.getElementById('fdesc').value,status:'active'};
   if(image_url) item.image_url=image_url;
