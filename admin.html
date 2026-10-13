@@ -88,7 +88,7 @@ async function load(){
   tbl.innerHTML='<tr><th>العنوان</th><th>النوع</th><th>السعر</th><th>الحالة</th><th></th></tr>'+rows.map((r,i)=>`<tr><td>${r.title||''}</td><td>${r.type||''}</td><td>${r.price||''}</td><td>${r.status==='active'?'منشور':'مخفي'}</td><td><button class="btn-sm" onclick="edit(${i})">تعديل</button><button class="btn-sm ok" onclick="pub(${i})">نشر</button><button class="btn-sm danger" onclick="del(${i})">حذف</button></td></tr>`).join('');
 }
 async function loadContacts(){
-  const {data,error}=await sb.from('contacts').select('*').order('id',{ascending:false});
+  const {data,error}=await sb.from('contacts').select('*');
   const tbl=document.getElementById('ctbl');
   if(error){tbl.innerHTML='<tr><td>خطأ: '+error.message+'</td></tr>';return}
   if(!data||!data.length){tbl.innerHTML='<tr><td>لا توجد طلبات</td></tr>';return}
