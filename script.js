@@ -139,19 +139,20 @@ listingForm.addEventListener('submit', async function(e) {
   e.preventDefault();
   var fd = new FormData(listingForm);
   var item = {
-    title: fd.get('propertyType') === 'land' ? 'أرض للبيع' : 'شقة للبيع',
-    location: fd.get('location'),
+    title: fd.get('location') || 'إعلان جديد',
+    location: fd.get('location') || '',
     area: fd.get('area') || '',
     price: fd.get('price') || '',
-    phone: fd.get('phone'),
-    type: fd.get('propertyType') === 'land' ? 'land-farm' : 'apt-sale',
+    phone: fd.get('phone') || '',
+    type: fd.get('propertyType') || 'land-farm',
     description: fd.get('description') || '',
     status: 'active'
   };
-  await sb.from('listings').insert(item);
+  var res = await sb.from('listings').insert(item);
+  if (res.error) { alert('خطأ: ' + res.error.message); return; }
   closeModal();
-  showToast('تم استلام إعلانك! هيظهر على الموقع قريب');
-  setTimeout(() => location.reload(), 1500);
+  showToast('تم إضافة الإعلان بنجاح');
+  setTimeout(function(){ location.reload(); }, 1200);
 });
 
 document.getElementById('contact-form').addEventListener('submit', function(e) {
