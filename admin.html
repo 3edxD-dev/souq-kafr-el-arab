@@ -18,7 +18,7 @@ th,td{padding:10px;border-bottom:1px solid #222;text-align:right}
 .ok{background:#2ecc71;color:#000}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 .modal.open{display:flex}
-.modal-box{background:#111;padding:20px;border-radius:12px;width:90%;max-width:400px}
+.modal-box{background:#111;padding:20px;border-radius:12px;width:90%;max-width:400px;max-height:90vh;overflow:auto}
 </style>
 </head>
 <body>
@@ -43,6 +43,7 @@ th,td{padding:10px;border-bottom:1px solid #222;text-align:right}
     <input id="fprice" placeholder="السعر">
     <input id="fphone" placeholder="الموبايل">
     <select id="ftype"><option value="land-farm">أرض زراعية</option><option value="land-building">أرض مباني</option><option value="apt-sale">شقة تمليك</option><option value="apt-rent">شقة إيجار</option></select>
+    <input type="file" id="fimage" accept="image/*">
     <textarea id="fdesc" placeholder="الوصف" rows="2"></textarea>
     <input id="fidx" type="hidden">
     <button onclick="save()">حفظ</button>
@@ -84,10 +85,19 @@ function edit(i){
 }
 async function save(){
   const i=document.getElementById('fidx').value;
+  const file=document.getElementById('fimage').files[0];
+  let image_url='';
+  if(file){
+    const name=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9.]/g,'');
+    const up=await sb.storage.from('images').upload(name,file);
+    if(up.error){alert('خطأ في رفع الصورة');return}
+    image_url=sb.storage.from('images').getPublicUrl(name).data.publicUrl;
+  }
   const item={title:document.getElementById('ftitle').value,location:document.getElementById('floc').value,area:document.getElementById('farea').value,price:document.getElementById('fprice').value,phone:document.getElementById('fphone').value,type:document.getElementById('ftype').value,description:document.getElementById('fdesc').value,status:'active'};
+  if(image_url) item.image_url=image_url;
   if(i===''){await sb.from('listings').insert(item)}
   else{const old=rows[i];await sb.from('listings').update(item).eq('title',old.title).eq('phone',old.phone)}
-  closeM(); load();
+  closeM(); load(); alert('تم الحفظ');
 }
 function pub(i){
   const r=rows[i];
