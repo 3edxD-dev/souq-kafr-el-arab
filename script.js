@@ -153,16 +153,20 @@ listingForm.addEventListener('submit', function(e) {
   showToast('تم استلام إعلانك! هنتواصل معاك قريب بعد المراجعة');
 });
 
-document.getElementById('contact-form').addEventListener('submit', async function(e) {
+document.getElementById('contact-form').addEventListener('submit', function(e) {
   e.preventDefault();
   var fd = new FormData(e.target);
-  await sb.from('contacts').insert({
-    name: fd.get('name')||'',
-    phone: fd.get('phone')||'',
-    type: fd.get('type')||'',
-    details: fd.get('details')||'',
-    status: 'new'
+  var contacts = getContacts();
+  contacts.unshift({
+    id: uuid(),
+    name: fd.get('name'),
+    phone: fd.get('phone'),
+    type: fd.get('type'),
+    details: fd.get('details'),
+    status: 'new',
+    created_at: new Date().toISOString()
   });
+  saveContacts(contacts);
   e.target.reset();
   showToast('تم إرسال طلبك بنجاح! هنتواصل معاك في أقرب وقت');
 });
@@ -191,3 +195,34 @@ window.addEventListener('scroll', function() {
 
 loadLands();
 loadApts();
+
+// Override contact form to save to Supabase
+(function(){
+  var form=document.getElementById('contact-form');
+  if(!form) return;
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var fd=new FormData(form);
+    await sb.from('contacts').insert({name:fd.get('name')||'',phone:fd.get('phone')||'',type:fd.get('type')||'',details:fd.get('details')||'',status:'new'});
+    form.reset();
+    alert('تم إرسال طلبك بنجاح');
+  }, true);
+})();
+
+// Load active listings from Supabase
+(function(){
+  sb.from('listings').select('*').eq('status','active').then(function(res){
+    if(!res.data||!res.data.length) return;
+    var lands=res.data.filter(function(l){return !l.type||String(l.type).indexOf('land')!==-1});
+    var apts=res.data.filter(function(l){return l.type&&String(l.type).indexOf('apt')!==-1});
+    function card(item){
+      var img=item.image_url?'<img src="'+item.image_url+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:3rem">'+(item.icon||'🏠')+'</span>';
+      return '<div class="listing-card"><div class="listing-img">'+img+'</div><div class="listing-body"><h3>'+(item.title||'')+'</h3><div class="listing-meta">📍 '+(item.location||'')+'<br>📐 '+(item.area||'-')+'</div><div class="listing-price">'+(item.price||'')+'</div><a href="tel:'+(item.phone||'')+'" class="btn btn-gradient">تواصل</a></div></div>';
+    }
+    var landsEl=document.getElementById('lands-grid');
+    var aptsEl=document.getElementById('apts-grid');
+    if(landsEl&&lands.length) landsEl.innerHTML=lands.map(card).join('');
+    if(aptsEl&&apts.length) aptsEl.innerHTML=apts.map(card).join('');
+  });
+})();
